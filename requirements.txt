@@ -1,3 +1,9 @@
 streamlit
 langchain-groq
 langchain
+streamlit
+langchain-groq
+langchain-community
+pypdf
+faiss-cpu
+fastembed
