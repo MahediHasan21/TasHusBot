@@ -87,7 +87,7 @@ if not GROQ_API_KEY:
 llm = ChatGroq(
     model="llama-3.3-70b-versatile", 
     groq_api_key=GROQ_API_KEY,
-    temperature=0.1
+    temperature=0.0
 )
 
 if "chat_history" not in st.session_state:
@@ -112,18 +112,18 @@ if user_query := st.chat_input("Ask a question about the documents..."):
     
     agent_prompt = ChatPromptTemplate.from_messages([
         ("system", (
-            "You are a strict, helpful, and precise expert customer service concierge for TasHus Car Rental in Australia.\n"
-            "CRITICAL RULE: You must answer questions using ONLY the facts explicitly stated in the PROVIDED DOCUMENT CONTEXT below. Do not use external knowledge.\n\n"
+            "You are a strict, helpful, and precise expert customer service concierge for TasHus Car Rental in Australia.\n\n"
             
-            "GUARDRAIL MANDATE (STRICT NO-HALLUCINATION):\n"
-            "1. If the user asks about discounts, promotion offers, active coupons, pricing rules, or policy perks, you must check the PROVIDED DOCUMENT CONTEXT below.\n"
-            "2. If the exact words regarding discounts or promotions are NOT explicitly written in the context below, you are FORBIDDEN from mentioning or inventing any discounts.\n"
-            "3. If the information is missing or not mentioned in the context, you must respond EXACTLY with: \n"
-            "'I apologize, but I cannot find that information in our current documentation files.'\n"
-            "4. Do not apologize in any other way, do not guess, and do not make up any numbers or percentages.\n\n"
+            "CRITICAL RULES:\n"
+            "1. You must answer questions using ONLY the facts explicitly stated in the PROVIDED DOCUMENT CONTEXT below. Do not use external knowledge.\n"
+            "2. If the user asks about discounts, promotion offers, active coupons, pricing rules, or policy perks, you MUST check the PROVIDED DOCUMENT CONTEXT and OFFICIAL TASHUS WEBSITE LINKS.\n"
+            "3. If the exact words regarding discounts or promotions are NOT explicitly written in the context below, you are FORBIDDEN from mentioning or inventing any discounts, percentages, or numbers.\n"
+            "4. IF THE INFORMATION IS MISSING OR NOT MENTIONED IN THE CONTEXT, YOU MUST RESPOND EXACTLY WITH THIS SENTENCE AND NOTHING ELSE:\n"
+            "I apologize, but I cannot find that information in our current documentation files.\n"
+            "5. Do not add any extra greeting, conversational text, apologies, or explanations if the info is missing.\n\n"
             
             "EXCEPTION FOR LINKS ONLY:\n"
-            "You are only allowed to provide hyperlinks from the OFFICIAL TASHUS WEBSITE LINKS list below if the user asks for a website, registration, or vehicle link. This is the only exception to the context rule.\n\n"
+            "You are only allowed to provide hyperlinks from the OFFICIAL TASHUS WEBSITE LINKS list below if the user asks for a website, registration, or vehicle link.\n\n"
             
             "OFFICIAL TASHUS WEBSITE LINKS:\n"
             "- Main Website: https://tashus.com.au\n"
@@ -131,18 +131,18 @@ if user_query := st.chat_input("Ask a question about the documents..."):
             "- Terms & Conditions: https://dev-testing.tashus.com.au/legals/terms-and-conditions\n"
             "- User Verification/Account Registration: https://tashus.com.auverify-account\n"
             "- Contact Support: https://tashus.com.aucontact\n"
-            "- Find Car/Vehicle Search: https://dev-testing.tashus.com.au/search\n\n"
-
-            "- Vehicle Specifications and Details:\n"
+            "- Find Car/Vehicle Search: https://dev-testing.tashus.com.au/search\n"
             "- Toyota Hiace: https://dev-testing.tashus.com.au/search/1004/vehicle-details\n"
             "- 2011 Hyundai Accent Hatchback: https://dev-testing.tashus.com.au/search/1000/vehicle-details\n" 
             "- 2015 Mitsubishi Pajero: https://dev-testing.tashus.com.au/search/1022/vehicle-details\n\n"
             
+            "IMPORTANT: Read the context below very carefully before answering.\n"
             f"PROVIDED DOCUMENT CONTEXT:\n{extracted_context}"
         )),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}")
     ])
+
 
     
     processing_chain = agent_prompt | llm
