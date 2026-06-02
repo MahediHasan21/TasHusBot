@@ -14,25 +14,28 @@ st.set_page_config(
     layout="centered"
 )
 
-GROQ_API_KEY = "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"
+# 🔒 পরিবর্তন: সরাসরি কী (Key) না লিখে Streamlit Secrets থেকে লোড করা হচ্ছে
+# এটি করার ফলে GitHub আপনার পুশ ব্লক করবে না।
+if "GROQ_API_KEY" in st.secrets:
+    GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
+else:
+    # লোকাল কম্পিউটারে রান করার সুবিধার জন্য ব্যাকআপ (যদি .env বা secrets না থাকে)
+    GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 st.markdown("""
 <style>
         .stApp { background-color: #f8f9fa; }
         .hero-banner {
-            /* Linear shift from Strong Udemy Electric Violet down to Dark Slate Blue */
             background: linear-gradient(135deg, #a435f0 0%, #5022c3 100%);
             padding: 2.5rem 2rem;
             border-radius: 16px;
             color: white;
             text-align: center;
-            /* Bottom highlight bar accentuating the header geometry */
             border-bottom: 5px solid #c0c4fc;
             box-shadow: 0 10px 25px rgba(164, 53, 240, 0.3);
             margin-bottom: 2rem;
         }
         .hero-banner h1 { color: white !important; font-size: 2.5rem !important; font-weight: 800 !important; }
-        /* High-visibility Ice Steel Blue for clear subtitle scannability */
         .hero-banner p { color: #c0c4fc !important; font-size: 1.1rem !important; font-weight: 500 !important; }
         .stChatInput { border-radius: 30px !important; box-shadow: 0 4px 15px rgba(164, 53, 240, 0.1) !important; }
     </style>
@@ -79,6 +82,11 @@ with st.status("Loading and indexing local PDF document structures...", expanded
     status.update(label="All PDF Data Successfully Cached!", state="complete", expanded=False)
 
 
+# 🔒 প্রটেকশন চেক: যদি এপিআই কী কোনোভাবেই না পাওয়া যায়
+if not GROQ_API_KEY:
+    st.error("API Key Error: Please set GROQ_API_KEY in Streamlit Secrets or Environment Variables.")
+    st.stop()
+
 llm = ChatGroq(
     model="llama-3.3-70b-versatile", 
     groq_api_key=GROQ_API_KEY,
@@ -123,7 +131,6 @@ if user_query := st.chat_input("Ask a question about the documents..."):
             "- Contact Support: https://tashus.com.aucontact\n"
             "- Find Car/Vehicle Search: https://dev-testing.tashus.com.au/search\n"
 
-
             "- Vehicle Specifications and Details:\n"
             "- Toyta Hiace: https://dev-testing.tashus.com.au/search/1004/vehicle-details\n"
             "- 2011 Hyundai Accent Hatchback: https://dev-testing.tashus.com.au/search/1000/vehicle-details\n" 
@@ -150,5 +157,6 @@ if user_query := st.chat_input("Ask a question about the documents..."):
         
     st.session_state.chat_history.append(HumanMessage(content=user_query))
     st.session_state.chat_history.append(AIMessage(content=ai_response.content))
+
 
 
