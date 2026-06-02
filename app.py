@@ -14,12 +14,9 @@ st.set_page_config(
     layout="centered"
 )
 
-# 🔒 পরিবর্তন: সরাসরি কী (Key) না লিখে Streamlit Secrets থেকে লোড করা হচ্ছে
-# এটি করার ফলে GitHub আপনার পুশ ব্লক করবে না।
 if "GROQ_API_KEY" in st.secrets:
     GROQ_API_KEY = st.secrets["GROQ_API_KEY"]
 else:
-    # লোকাল কম্পিউটারে রান করার সুবিধার জন্য ব্যাকআপ (যদি .env বা secrets না থাকে)
     GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 
 st.markdown("""
@@ -82,7 +79,7 @@ with st.status("Loading and indexing local PDF document structures...", expanded
     status.update(label="All PDF Data Successfully Cached!", state="complete", expanded=False)
 
 
-# 🔒 প্রটেকশন চেক: যদি এপিআই কী কোনোভাবেই না পাওয়া যায়
+
 if not GROQ_API_KEY:
     st.error("API Key Error: Please set GROQ_API_KEY in Streamlit Secrets or Environment Variables.")
     st.stop()
@@ -115,8 +112,14 @@ if user_query := st.chat_input("Ask a question about the documents..."):
     
     agent_prompt = ChatPromptTemplate.from_messages([
         ("system", (
-            "You are an expert customer service concierge for TasHus Car Rental in Australia.\n"
-            "Formulate friendly, clear, and precise answers using exclusively the document context below.\n\n"
+            "You are a strict, helpful, and precise expert customer service concierge for TasHus Car Rental in Australia.\n"
+            "Formulate friendly, clear, and precise answers using EXCLUSIVELY the facts explicitly stated in the document context below.\n\n"
+            
+            "GUARDRAIL MANDATE:\n"
+            "1. If the user asks about something (such as discounts, promotion offers, policies, or specific pricing) that is NOT explicitly detailed in the provided context below, you must strictly decline to guess.\n"
+            "2. In all cases where information is missing from the context, respond exactly with: "
+            "'I apologize, but I cannot find that information in our current documentation files.'\n"
+            "3. Do not invent, assume, or pull any data from your external training knowledge regarding TasHus Car Rental rules or perks.\n\n"
             
             "CRITICAL LINK INSTRUCTION:\n"
             "If the user asks for a website link, page link, URL, or wants to navigate to a specific page on TasHus, "
@@ -129,21 +132,19 @@ if user_query := st.chat_input("Ask a question about the documents..."):
             "- Terms & Conditions: https://dev-testing.tashus.com.au/legals/terms-and-conditions\n"
             "- User Verification/Account Registration: https://tashus.com.auverify-account\n"
             "- Contact Support: https://tashus.com.aucontact\n"
-            "- Find Car/Vehicle Search: https://dev-testing.tashus.com.au/search\n"
+            "- Find Car/Vehicle Search: https://dev-testing.tashus.com.au/search\n\n"
 
             "- Vehicle Specifications and Details:\n"
-            "- Toyta Hiace: https://dev-testing.tashus.com.au/search/1004/vehicle-details\n"
+            "- Toyota Hiace: https://dev-testing.tashus.com.au/search/1004/vehicle-details\n"
             "- 2011 Hyundai Accent Hatchback: https://dev-testing.tashus.com.au/search/1000/vehicle-details\n" 
-            "- 2015 Mitsubishi Pajero: https://dev-testing.tashus.com.au/search/1022/vehicle-details\n"
+            "- 2015 Mitsubishi Pajero: https://dev-testing.tashus.com.au/search/1022/vehicle-details\n\n"
             
-            "If the text query is about content rules but does NOT match any known website link above, "
-            "and it isn't explicitly detailed in the context, say: "
-            "'I apologize, but I cannot find that information in our current documentation files.'\n\n"
             f"PROVIDED DOCUMENT CONTEXT \n{extracted_context}"
         )),
         MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}")
     ])
+
     
     processing_chain = agent_prompt | llm
 
