@@ -1,12 +1,5 @@
 import streamlit as st
 import os
-# Optional: if the developer has python-dotenv installed, load a local .env file
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except Exception:
-    # dotenv is optional; if it's not installed we continue and rely on environment variables
-    pass
 from langchain_groq import ChatGroq 
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_community.document_loaders import PyPDFLoader 
@@ -21,14 +14,7 @@ st.set_page_config(
     layout="centered"
 )
 
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-if not GROQ_API_KEY:
-    st.error(
-        "Configuration error: GROQ_API_KEY environment variable is not set.\n"
-        "Create a local `.env` file (add it to .gitignore) or set the environment variable before running.\n"
-        "See `.env.example` for the required variable name."
-    )
-    st.stop()
+GROQ_API_KEY = "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"
 
 st.markdown("""
 <style>
