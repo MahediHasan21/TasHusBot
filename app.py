@@ -87,7 +87,7 @@ if not GROQ_API_KEY:
 llm = ChatGroq(
     model="llama-3.3-70b-versatile", 
     groq_api_key=GROQ_API_KEY,
-    temperature=0.0
+    temperature=0.2
 )
 
 if "chat_history" not in st.session_state:
@@ -116,7 +116,7 @@ if user_query := st.chat_input("Ask a question about the documents..."):
             
             "CRITICAL RULES:\n"
             "1. You must answer questions using ONLY the facts explicitly stated in the PROVIDED DOCUMENT CONTEXT below. Do not use external knowledge.\n"
-            "2. If the user asks about discounts, promotion offers, active coupons, pricing rules, or policy perks, you MUST check the PROVIDED DOCUMENT CONTEXT and OFFICIAL TASHUS WEBSITE LINKS.\n"
+            "2. If the user asks about discounts, promotion offers, active coupons, pricing rules, or policy perks, you MUST check the PROVIDED DOCUMENT CONTEXT \n"
             "3. If the exact words regarding discounts or promotions are NOT explicitly written in the context below, you are FORBIDDEN from mentioning or inventing any discounts, percentages, or numbers.\n"
             "4. IF THE INFORMATION IS MISSING OR NOT MENTIONED IN THE CONTEXT, YOU MUST RESPOND EXACTLY WITH THIS SENTENCE AND NOTHING ELSE:\n"
             "I apologize, but I cannot find that information in our current documentation files.\n"
