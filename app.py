@@ -87,7 +87,7 @@ if not GROQ_API_KEY:
 llm = ChatGroq(
     model="llama-3.3-70b-versatile", 
     groq_api_key=GROQ_API_KEY,
-    temperature=0.2
+    temperature=0.1
 )
 
 if "chat_history" not in st.session_state:
