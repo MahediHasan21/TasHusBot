@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+venv/
+ENV/
+env/
+
+# dotenv environment variables
+.env
+
+# OS files
+.DS_Store
+
+# Streamlit cache
+.streamlit/
+
+# Editor directories and files
+.vscode/
+.idea/
+
+# Python packaging
+dist/
+build/
+*.egg-info/
